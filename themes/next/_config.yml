@@ -323,8 +323,8 @@ han: false
 
 # Disqus
 disqus:
-  enable: false
-  shortname:
+  enable: true
+  shortname: dhpo
   count: true
 
 # Hypercomments
@@ -389,7 +389,7 @@ duoshuo_info:
 # Gitment
 # Introduction: https://imsun.net/posts/gitment-introduction/
 gitment:
-  enable: true
+  enable: false
   githubID: DHPO
   repo: dhpo.github.io
   ClientID: ddd97350cc69df549a5f
