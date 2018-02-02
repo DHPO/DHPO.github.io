@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言昨天帮xkz搭了一个WordPress博客以后，我觉得应该给自己也弄一个技术博客，向大牛们看齐。 个人博客框架中最著名的莫过于WordPress，而近年来Hexo也同样流行。我对这两个框架做了比较：  在写作方式上，Hexo为静态博客，需要在本地完成写作后部署至服务器，仅支持Markdown；而WordPress可以在浏览器中直接写作，默认使用富文本。对于非程序员而言，后者更加友好。 在部署环">
+<meta name="keywords" content="Hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo + github 搭建个人静态博客">
+<meta property="og:url" content="http://yoursite.com/2018/02/02/Hexo-github-搭建个人静态博客/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Blog">
+<meta property="og:description" content="前言昨天帮xkz搭了一个WordPress博客以后，我觉得应该给自己也弄一个技术博客，向大牛们看齐。 个人博客框架中最著名的莫过于WordPress，而近年来Hexo也同样流行。我对这两个框架做了比较：  在写作方式上，Hexo为静态博客，需要在本地完成写作后部署至服务器，仅支持Markdown；而WordPress可以在浏览器中直接写作，默认使用富文本。对于非程序员而言，后者更加友好。 在部署环">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-02T11:10:49.607Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo + github 搭建个人静态博客">
+<meta name="twitter:description" content="前言昨天帮xkz搭了一个WordPress博客以后，我觉得应该给自己也弄一个技术博客，向大牛们看齐。 个人博客框架中最著名的莫过于WordPress，而近年来Hexo也同样流行。我对这两个框架做了比较：  在写作方式上，Hexo为静态博客，需要在本地完成写作后部署至服务器，仅支持Markdown；而WordPress可以在浏览器中直接写作，默认使用富文本。对于非程序员而言，后者更加友好。 在部署环">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/02/Hexo-github-搭建个人静态博客/"/>
+
+
+
+
+
+  <title>Hexo + github 搭建个人静态博客 | Jimmy's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jimmy's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学习一个</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/02/Hexo-github-搭建个人静态博客/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jimmy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jimmy's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Hexo + github 搭建个人静态博客</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-02T15:42:26+08:00">
+                2018-02-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>昨天帮xkz搭了一个WordPress博客以后，我觉得应该给自己也弄一个技术博客，向大牛们看齐。</p>
+<p>个人博客框架中最著名的莫过于WordPress，而近年来Hexo也同样流行。我对这两个框架做了比较：</p>
+<ul>
+<li>在写作方式上，Hexo为静态博客，需要在本地完成写作后部署至服务器，仅支持Markdown；而WordPress可以在浏览器中直接写作，默认使用富文本。对于非程序员而言，后者更加友好。</li>
+<li>在部署环境上，Hexo的部署只需要服务器支持读取静态文件；WordPress则需要php、MySQL等全套环境</li>
+<li>在功能上，Hexo本身只提供浏览功能（但可以使用第三方扩展）；WordPress具有用户管理、评论、网站管理等相对齐全的功能</li>
+<li>在数据存储与备份方式上，Hexo可以直接对md文件备份（可以使用github、百度云等方式）；WordPress需要dump数据库</li>
+<li>在安全性上，Hexo仅支持静态文件访问，难以下手；而WordPress功能复杂，尤其是如果部署时使用默认参数可能引起严重的安全问题</li>
+</ul>
+<p>考虑到上个月刚因为部署了XXNet client而被阿里云查水表，云主机的可靠性值得怀疑，所以我选择Hexo作为技术方案。</p>
+<h1 id="Github-Page简介"><a href="#Github-Page简介" class="headerlink" title="Github Page简介"></a>Github Page简介</h1><p><a href="https://pages.github.com/" target="_blank" rel="noopener">Github Page</a>是Github提供的简单建站服务，提供静态网页浏览的功能。经常见到的域名为<code>*.github.io</code>的项目介绍网站就是通过这个服务搭建的。</p>
+<p>Github Page与名为<code>[username].github.io</code>的仓库关联。其中<code>[username]</code>为github用户名，大小写不敏感。这个仓库中的文件可以通过<code>https://[username].github.io/[filename]</code>访问。因此，我们的部署思路是：</p>
+<ul>
+<li>在本地使用Markdown完成内容创作</li>
+<li>使用Hexo输出静态网页文件（html, js, css, …）</li>
+<li>将上述静态文件上传到github仓库中</li>
+<li>然后就可以通过<code>[username].github.io</code>访问博客了</li>
+</ul>
+<p>在commit以后可能需要等待30s才能看到内容变化。</p>
+<h1 id="Hexo的使用"><a href="#Hexo的使用" class="headerlink" title="Hexo的使用"></a>Hexo的使用</h1><h2 id="Hexo简介"><a href="#Hexo简介" class="headerlink" title="Hexo简介"></a>Hexo简介</h2><p>Hexo是由 tommy351 开发的，基于 Node.js 的静态博客框架。<strong>静态</strong>主要是指博客的内容不能在浏览器中修改，而需要通过修改本地文件并重新上传的方式发表博文。</p>
+<h2 id="Hexo的安装"><a href="#Hexo的安装" class="headerlink" title="Hexo的安装"></a>Hexo的安装</h2><h3 id="安装Node-js"><a href="#安装Node-js" class="headerlink" title="安装Node.js"></a>安装Node.js</h3><p>前往<a href="https://nodejs.org/zh-cn/" target="_blank" rel="noopener">Node.js下载页面</a>，下载安装程序（建议选择LTS版）。</p>
+<p>Ubuntu/Debian用户可以直接在终端中安装：<code>$ sudo apt install nodejs</code>。</p>
+<p>安装完成后，检查是否配置正确：<code>$ npm -v</code>，如果输出了npm的版本号，则说明安装正确。（npm是nodejs自带的包管理工具）</p>
+<h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><ol>
+<li>安装Hexo：<code>$ npm install hexo-cli -g</code> 。如果提示权限问题则使用<code>sudo</code>运行。</li>
+<li>选择一个目录作为博客目录，使用命令<code>$ hexo init blog</code>初始化博客系统</li>
+<li>切换到博客目录下安装依赖：<code>$ cd blog &amp;&amp; npm install</code></li>
+<li>启动预览服务器：<code>$ hexo s</code>，在浏览器中访问<code>localhost:4000</code>，如果一切正常就可以看到博客页面了</li>
+</ol>
+<p>根目录下的<code>_config.yml</code>是Hexo的配置文件，可以按照个人喜好修改博客的配置。</p>
+<h2 id="添加博文"><a href="#添加博文" class="headerlink" title="添加博文"></a>添加博文</h2><p><em>这里只介绍最基础的文章格式，其他格式的文章请参考<a href="https://hexo.io/zh-cn/docs/writing.html" target="_blank" rel="noopener">官方文档</a></em></p>
+<ol>
+<li>新建一篇博文：<code>$ hexo new [title]</code></li>
+<li>切换到<code>/source/_posts</code>目录下，可以看到新增了一个名为<code>[title].md</code>的文件</li>
+<li>打开<code>[title].md</code>进行创作，并保存</li>
+<li>回到根目录下，启动预览服务器(如果之前已经启动则忽略这一步) :<code>$ hexo s</code></li>
+<li>在浏览器中浏览<code>localhost:4000</code>，可以看到新增的文章了</li>
+<li>如果对预览感到满意，则生成静态文件：<code>$ hexo g</code></li>
+</ol>
+<p>至此博客系统可以在单机上顺利运行了。但要让全世界都能看得到你的博客，还需要将它部署到github上。</p>
+<h2 id="Hexo常用命令总结"><a href="#Hexo常用命令总结" class="headerlink" title="Hexo常用命令总结"></a>Hexo常用命令总结</h2><ul>
+<li><code>$ hexo init [name]</code>: 初始化博客系统</li>
+<li><code>$ hexo s</code>/<code>$ hexo server</code>：启动预览服务器。服务器启动后在浏览器中访问<code>localhost:4000</code>预览博客内容</li>
+<li><code>$ hexo new [name]</code>: 新建一篇以<code>[name]</code>为标题的博文，博文保存在<code>/source/_posts</code>目录下</li>
+<li><code>$ hexo new [layout] [name]</code>: 新建<code>layout</code>类型的文章</li>
+<li><code>$ hexo g</code>/<code>$ hexo generate</code>：生成静态文件</li>
+<li><code>$ hexo d</code>/<code>$ hexo deploy</code>: 按<code>_config.yml</code>的配置部署</li>
+<li><code>$ hexo g -d</code>: 生成静态文件后部署</li>
+<li><code>$ hexo clean</code>：清除静态文件缓存</li>
+</ul>
+<h1 id="部署与备份"><a href="#部署与备份" class="headerlink" title="部署与备份"></a>部署与备份</h1><h2 id="部署方式"><a href="#部署方式" class="headerlink" title="部署方式"></a>部署方式</h2><p>比较naive的部署方式为将生成的静态文件复制到仓库的本地文件夹中，再push到github仓库。</p>
+<p>不过，Hexo提供了更加高效的部署方式：</p>
+<ol>
+<li><p>首先安装 <a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git</a>：<code>$ npm install hexo-deployer-git --save</code></p>
+</li>
+<li><p>修改<code>_config.yml</code>中的<code>deploy</code>项（在文件的末尾）：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repo:</span> <span class="string">[repo地址]</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行<code>$ hexo d</code>进行部署，过程中可能要求输入github的用户名和密码</p>
+</li>
+</ol>
+<p>每次添加或修改博文后，执行<code>$ hexo g -d</code>部署到github上。</p>
+<h2 id="备份策略"><a href="#备份策略" class="headerlink" title="备份策略"></a>备份策略</h2><p>为了保障博客的数据安全，博文的Markdown源文件、Hexo配置文件、theme配置文件都应该备份。</p>
+<p>我们可以新建一个分支用于备份这些源文件，而不必另外建一个仓库：</p>
+<ol>
+<li>初始化git仓库：<code>$ git init</code></li>
+<li>新建一个分支：<code>$ git checkout -b hexo</code></li>
+<li>添加需要管理的文件：<code>$ git add -A</code>(十分贴心的是Hexo已经提供了一个<code>.gitignore</code>文件)</li>
+<li>在本地commit：<code>$ git commit -m &quot;init&quot;</code></li>
+<li>关联到github远程仓库：<code>$ git remote add hexo [repo地址]</code></li>
+<li>push到github：<code>$ git push</code></li>
+</ol>
+<p>如果需要恢复数据，只需将这个分支clone下来，并再执行一次<code>$ npm install</code>安装依赖，就能将数据（博文和设置）完全恢复了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/02/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+     
+       <div id="gitment-container"></div>
+     
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Jimmy" />
+          <p class="site-author-name" itemprop="name">Jimmy</p>
+           
+              <p class="site-description motion-element" itemprop="description">sometimes naive</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Github-Page简介"><span class="nav-number">2.</span> <span class="nav-text">Github Page简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Hexo的使用"><span class="nav-number">3.</span> <span class="nav-text">Hexo的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo简介"><span class="nav-number">3.1.</span> <span class="nav-text">Hexo简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo的安装"><span class="nav-number">3.2.</span> <span class="nav-text">Hexo的安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Node-js"><span class="nav-number">3.2.1.</span> <span class="nav-text">安装Node.js</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo"><span class="nav-number">3.2.2.</span> <span class="nav-text">安装Hexo</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加博文"><span class="nav-number">3.3.</span> <span class="nav-text">添加博文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo常用命令总结"><span class="nav-number">3.4.</span> <span class="nav-text">Hexo常用命令总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署与备份"><span class="nav-number">4.</span> <span class="nav-text">部署与备份</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#部署方式"><span class="nav-number">4.1.</span> <span class="nav-text">部署方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#备份策略"><span class="nav-number">4.2.</span> <span class="nav-text">备份策略</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jimmy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+     
+     
+     
+     
+     <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+     <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+     
+         <script type="text/javascript">
+             var gitment = new Gitment({
+                id: document.location.href, 
+                 owner: 'DHPO',
+                 repo: 'dhpo.github.io',
+                 oauth: {
+                     client_id: 'ddd97350cc69df549a5f',
+                     client_secret: 'f7e8bd53c90e792ae2a92902d4428f5652fc68a7',
+                 }});
+             gitment.render('gitment-container');
+         </script>
+     
+ 
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
