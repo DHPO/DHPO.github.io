@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="mit6.828,OS," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="实验内容:https://ipads.se.sjtu.edu.cn/courses/os/labs/lab1.html 环境配置gcc降级需要注意的是这个lab只能使用gcc4.8及以下版本编译，否则运行会有问题。 gcc降级的最简单的方法是将/usr/bin目录下的gcc删去，并做一个到gcc-4.8的符号链接： 123cd /usr/binsudo rm gccsudo ln -s gcc-4">
+<meta name="keywords" content="mit6.828,OS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OS Lab1 实验报告">
+<meta property="og:url" content="http://yoursite.com/2018/03/18/OS-Lab1-实验报告/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Blog">
+<meta property="og:description" content="实验内容:https://ipads.se.sjtu.edu.cn/courses/os/labs/lab1.html 环境配置gcc降级需要注意的是这个lab只能使用gcc4.8及以下版本编译，否则运行会有问题。 gcc降级的最简单的方法是将/usr/bin目录下的gcc删去，并做一个到gcc-4.8的符号链接： 123cd /usr/binsudo rm gccsudo ln -s gcc-4">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-18T12:56:02.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OS Lab1 实验报告">
+<meta name="twitter:description" content="实验内容:https://ipads.se.sjtu.edu.cn/courses/os/labs/lab1.html 环境配置gcc降级需要注意的是这个lab只能使用gcc4.8及以下版本编译，否则运行会有问题。 gcc降级的最简单的方法是将/usr/bin目录下的gcc删去，并做一个到gcc-4.8的符号链接： 123cd /usr/binsudo rm gccsudo ln -s gcc-4">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/18/OS-Lab1-实验报告/"/>
+
+
+
+
+
+  <title>OS Lab1 实验报告 | Jimmy's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jimmy's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学习一个</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/18/OS-Lab1-实验报告/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jimmy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jimmy's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OS Lab1 实验报告</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-18T20:46:06+08:00">
+                2018-03-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/18/OS-Lab1-实验报告/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/18/OS-Lab1-实验报告/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>实验内容:<a href="https://ipads.se.sjtu.edu.cn/courses/os/labs/lab1.html" target="_blank" rel="noopener">https://ipads.se.sjtu.edu.cn/courses/os/labs/lab1.html</a></p>
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><h3 id="gcc降级"><a href="#gcc降级" class="headerlink" title="gcc降级"></a>gcc降级</h3><p>需要注意的是这个lab只能使用<strong>gcc4.8及以下版本</strong>编译，否则运行会有问题。</p>
+<p>gcc降级的最简单的方法是将<code>/usr/bin</code>目录下的<code>gcc</code>删去，并做一个到<code>gcc-4.8</code>的符号链接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/bin</span><br><span class="line">sudo rm gcc</span><br><span class="line">sudo ln -s gcc-4.8 gcc</span><br></pre></td></tr></table></figure>
+<p>如果没有安装gcc4.8，就先安装一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install gcc-4.8</span><br></pre></td></tr></table></figure>
+<h3 id="32位依赖包的安装"><a href="#32位依赖包的安装" class="headerlink" title="32位依赖包的安装"></a>32位依赖包的安装</h3><p>在编译的时候如果出现<code>__udivdi3 not found</code>或<code>__muldi3 not found</code>的问题，可能是缺少依赖包导致的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install gcc-multilib</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，如果问题依然存在，可能上述的依赖包是给gcc5以上使用的，安装给gcc4.8使用的依赖包即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install gcc-4.8-multilib</span><br></pre></td></tr></table></figure>
+<h3 id="qemu安装"><a href="#qemu安装" class="headerlink" title="qemu安装"></a>qemu安装</h3><p>这个没什么坑，按照<a href="https://ipads.se.sjtu.edu.cn/courses/os/labs/tools.html" target="_blank" rel="noopener">tools</a>说的做就行了</p>
+<h2 id="系统的启动流程"><a href="#系统的启动流程" class="headerlink" title="系统的启动流程"></a>系统的启动流程</h2><p>刚启动时，内存的布局是这样的（都是物理地址）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">+------------------+  &lt;- 0xFFFFFFFF (4GB)</span><br><span class="line">|      32-bit      |</span><br><span class="line">|  memory mapped   |</span><br><span class="line">|     devices      |</span><br><span class="line">|                  |</span><br><span class="line">/\/\/\/\/\/\/\/\/\/\</span><br><span class="line"></span><br><span class="line">/\/\/\/\/\/\/\/\/\/\</span><br><span class="line">|                  |</span><br><span class="line">|      Unused      |</span><br><span class="line">|                  |</span><br><span class="line">+------------------+  &lt;- depends on amount of RAM</span><br><span class="line">|                  |</span><br><span class="line">|                  |</span><br><span class="line">| Extended Memory  |</span><br><span class="line">|                  |</span><br><span class="line">|                  |</span><br><span class="line">+------------------+  &lt;- 0x00100000 (1MB)</span><br><span class="line">|     BIOS ROM     |</span><br><span class="line">+------------------+  &lt;- 0x000F0000 (960KB)</span><br><span class="line">|  16-bit devices, |</span><br><span class="line">|  expansion ROMs  |</span><br><span class="line">+------------------+  &lt;- 0x000C0000 (768KB)</span><br><span class="line">|   VGA Display    |</span><br><span class="line">+------------------+  &lt;- 0x000A0000 (640KB)</span><br><span class="line">|                  |</span><br><span class="line">|    Low Memory    |</span><br><span class="line">|                  |</span><br><span class="line">+------------------+  &lt;- 0x00000000</span><br></pre></td></tr></table></figure>
+<p>启动的步骤大概是这样的：</p>
+<ol>
+<li>从ROM中加载BIOS程序，从<code>0xffff0</code>开始执行</li>
+<li>BIOS将磁盘(或其他设备)的第一个扇区加载至<code>0x7c00</code>并执行（即boot loader,<code>/boot/boot.S</code>）</li>
+<li>boot loader 在完成硬件初始化、启动保护模式、加载kernel等任务后，将控制权转移到kernel(<code>/kern/entry.S</code>)</li>
+<li>entry.S加载页表，设置esp、ebp，之后将控制权转移到init.c中的<code>i386_init</code>之后就是初始化显示设备、启动console之类的工作</li>
+</ol>
+<p>启动过程中的注意点如下：</p>
+<ol>
+<li><p>注意区别BIOS和boot loader，我之前一直把BIOS加载boot loader和boot loader加载kernel当作一回事，然后就十分僵硬</p>
+</li>
+<li><p>BIOS和boot loader 都经历了从实模式到保护模式的变化(i8086 =&gt; i386)</p>
+</li>
+<li><p>kernel的加载位置是0x10000，而entry的位置是0x10000c（根据ELF的格式，在加载完成后0x10018处的数据就是entry的地址）</p>
+</li>
+<li><p>页表在entrypgdir.c中，映射方式为：</p>
+<ul>
+<li>[0, 4MB) =&gt; [0, 4MB) 只读</li>
+<li>[KERNBASE + 0, KERNBASE + 4MB) =&gt; [0, 4MB）可写</li>
+</ul>
+<p>因此在启用虚拟地址后依然可以使用物理地址取指</p>
+</li>
+<li><p>boot loader在磁盘的第一个sector，kernel从第二个sector开始（见/boot/main.c的注释）</p>
+</li>
+<li><p>ljmp和非本地跳转的longjump不是一回事</p>
+</li>
+</ol>
+<h2 id="可变参数数量的函数"><a href="#可变参数数量的函数" class="headerlink" title="可变参数数量的函数"></a>可变参数数量的函数</h2><p>理论上，只需要caller将参数按照顺序压栈，callee按照首个参数的地址依次+4的顺序读内存，即可得到所有的参数，实现可变参数数量。</p>
+<p>但是这样有两个问题：</p>
+<ul>
+<li>需要知道参数的数据类型</li>
+<li>需要知道参数的数量</li>
+</ul>
+<p>stdarg.h对上述操作进行了一定程度的封装。</p>
+<h3 id="stdarg-h"><a href="#stdarg-h" class="headerlink" title="stdarg.h"></a>stdarg.h</h3><p>stdarg.h中存在如下的宏定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _INTSIZEOF(n) ((sizeof(n)+sizeof(int)-1)&amp;~(sizeof(int) - 1) ) <span class="comment">// size对齐</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> va_start(ap,v) ( ap = (va_list)&amp;v + _INTSIZEOF(v) ) <span class="comment">//第一个可选参数地址</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> va_arg(ap,t) ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) ) <span class="comment">//下一个参数地址</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> va_end(ap) ( ap = (va_list)0 ) <span class="comment">// 将指针置为无效</span></span></span><br></pre></td></tr></table></figure>
+<p>以lab中的代码为例：</p>
+<p>printf.c:25</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">cprintf(<span class="keyword">const</span> <span class="keyword">char</span> *fmt, ...)</span><br><span class="line">&#123;</span><br><span class="line">	va_list ap;</span><br><span class="line">	<span class="keyword">int</span> cnt;</span><br><span class="line"></span><br><span class="line">	va_start(ap, fmt);</span><br><span class="line">	cnt = vcprintf(fmt, ap);</span><br><span class="line">	va_end(ap);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> cnt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>printfmt.c:158</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'*'</span>:</span><br><span class="line">	precision = va_arg(ap, <span class="keyword">int</span>);</span><br><span class="line">	<span class="keyword">goto</span> process_precision;</span><br></pre></td></tr></table></figure>
+<p>其中<code>va_start</code>使用第一个参数的地址初始化参数列表<code>ap</code>，之后每次使用时传入<code>ap</code>和参数类型，从中取出下一个参数。</p>
+<p>不过这依然无法解决参数数量的预期和实际不一致的问题，下面的一些练习就与此相关。</p>
+<h2 id="Exercises"><a href="#Exercises" class="headerlink" title="Exercises"></a>Exercises</h2><h3 id="Exercise-3"><a href="#Exercise-3" class="headerlink" title="Exercise 3"></a>Exercise 3</h3><blockquote>
+<p>At what point does the processor start executing 32-bit code? What exactly causes the switch from 16- to 32-bit mode?</p>
+</blockquote>
+<p>gdb记录如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[   0:7c2d] =&gt; 0x7c2d:	ljmp   $0x8,$0x7c32</span><br><span class="line">0x00007c2d in ?? ()</span><br><span class="line">(gdb) </span><br><span class="line">The target architecture is assumed to be i386</span><br><span class="line">=&gt; 0x7c32:	mov    $0x10,%ax</span><br><span class="line">0x00007c32 in ?? ()</span><br></pre></td></tr></table></figure>
+<p>说明引起变化的语句是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Jump to next instruction, but in 32-bit code segment.</span><br><span class="line"># Switches processor into 32-bit mode.</span><br><span class="line">  ljmp    $PROT_MODE_CSEG, $protcseg</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>What is the <em>last</em> instruction of the boot loader executed, and what is the <em>first</em> instruction of the kernel it just loaded?</p>
+</blockquote>
+<p>boot loader的最后一条是(/boot/main.c:60)</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((<span class="keyword">void</span> (*)(<span class="keyword">void</span>)) (ELFHDR-&gt;e_entry))();</span><br></pre></td></tr></table></figure>
+<p>kernel的第一条是(/kern/entry.S:44)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">entry:</span><br><span class="line">	movw	$0x1234,0x472			# warm boot</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>How does the boot loader decide how many sectors it must read in order to fetch the entire kernel from disk? Where does it find this information?</p>
+</blockquote>
+<p>ELF的头部提供了信息</p>
+<h3 id="Exercise5"><a href="#Exercise5" class="headerlink" title="Exercise5"></a>Exercise5</h3><blockquote>
+<p>Reset the machine (exit QEMU/GDB and start them again). Examine the 8 words of memory at 0x00100000 at the point the BIOS enters the boot loader, and then again at the point the boot loader enters the kernel. Why are they different? What is there at the second breakpoint? (You do not really need to use QEMU to answer this question. Just think.)</p>
+</blockquote>
+<p>boot loader 将kernel加载到了这里</p>
+<h3 id="Exercise6"><a href="#Exercise6" class="headerlink" title="Exercise6"></a>Exercise6</h3><blockquote>
+<p>Trace through the first few instructions of the boot loader again and identify the first instruction that would “break” or otherwise do the wrong thing if you were to get the boot loader’s link address wrong. Then change the link address in<code>boot/Makefrag</code> to something wrong, run <code>make clean</code>, recompile the lab with <code>make</code>, and trace into the boot loader again to see what happens. Don’t forget to change the link address back and <code>make clean</code> afterwards!</p>
+</blockquote>
+<p>即修改/boot/Makefrag:28</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$(V)$(LD) $(LDFLAGS) -N -e start -Ttext 0x7C00 -o $@.out $^</span><br></pre></td></tr></table></figure>
+<p><code>0x7c00</code>修改为其它值后无法启动。BIOS钦定了<code>0x7c00</code>来接管，就不要搞一个大新闻了</p>
+<h3 id="Exercise7"><a href="#Exercise7" class="headerlink" title="Exercise7"></a>Exercise7</h3><blockquote>
+<p>Use QEMU and GDB to trace into the JOS kernel and find where the new virtual-to-physical mapping takes effect. Then examine the Global Descriptor Table (GDT) that the code uses to achieve this effect, and make sure you understand what’s going on.</p>
+</blockquote>
+<p>不知道怎么才能用gdb看GDT，据说要运行在ring0才行</p>
+<blockquote>
+<p>What is the first instruction <em>after</em> the new mapping is established that would fail to work properly if the old mapping were still in place? Comment out or otherwise intentionally break the segmentation setup code in <code>kern/entry.S</code>, trace into it, and see if you were right.</p>
+</blockquote>
+<p>接下来使用虚拟地址的地方就会出错，也就是这一句(/kern/entry.S:67)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jmp	*%eax</span><br></pre></td></tr></table></figure>
+<p>这里源代码中也有一个小问题：</p>
+<blockquote>
+<p>Now paging is enabled, but we’re still running at a low EIP(why is this okay?)</p>
+</blockquote>
+<p>关于这一点我在系统的启动流程的注意点4中已经解释过。</p>
+<h3 id="Exercise8"><a href="#Exercise8" class="headerlink" title="Exercise8"></a>Exercise8</h3><blockquote>
+<p>We have omitted a small fragment of code - the code necessary to print octal numbers using patterns of the form “%o”. Find and fill in this code fragment. Remember the octal number should begin with ‘0’.</p>
+</blockquote>
+<p>我一个OS的lab怎么第一项工作是做字符串处理？</p>
+<p>参考16进制的写法就行了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'o'</span>:</span><br><span class="line">	<span class="comment">// Replace this with your code.</span></span><br><span class="line">	<span class="comment">// display a number in octal form and the form should begin with '0'</span></span><br><span class="line">	putch(<span class="string">'0'</span>, putdat);</span><br><span class="line">	num = getuint(&amp;ap, lflag);</span><br><span class="line">	base = <span class="number">8</span>;</span><br><span class="line">	<span class="keyword">goto</span> number;</span><br></pre></td></tr></table></figure>
+<h3 id="Exercise9-0"><a href="#Exercise9-0" class="headerlink" title="Exercise9.0"></a>Exercise9.0</h3><blockquote>
+<p>You need also to add support for the “+” flag, which forces to precede the result with a plus or minus sign (+ or -) even for positive numbers.</p>
+</blockquote>
+<p>思路：如果读到‘+’，那么立一个flag：“需要显示‘+’”；再像平常那样读符号，如果是有符号整数且是正数，那么向输出流中放一个‘+’，再正常显示数字。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'+'</span>:</span><br><span class="line">	signedflag = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">goto</span> reswitch;</span><br><span class="line"><span class="comment">/* ... */</span></span><br><span class="line"><span class="keyword">case</span> <span class="string">'d'</span>:</span><br><span class="line">	num = getint(&amp;ap, lflag);</span><br><span class="line">	<span class="keyword">if</span> ((<span class="keyword">long</span> <span class="keyword">long</span>) num &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		putch(<span class="string">'-'</span>, putdat);</span><br><span class="line">		num = -(<span class="keyword">long</span> <span class="keyword">long</span>) num;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (signedflag) &#123;</span><br><span class="line">		putch(<span class="string">'+'</span>, putdat);</span><br><span class="line">	&#125;</span><br><span class="line">	base = <span class="number">10</span>;</span><br><span class="line">	<span class="keyword">goto</span> number;</span><br></pre></td></tr></table></figure>
+<h3 id="Exercise9-1"><a href="#Exercise9-1" class="headerlink" title="Exercise9.1"></a>Exercise9.1</h3><blockquote>
+<p>Explain the interface between <code>printf.c</code> and <code>console.c</code>. Specifically, what function does <code>console.c</code>export? How is this function used by <code>printf.c</code>?</p>
+</blockquote>
+<p>这两者的接口为<code>cputchar</code>，作用是往输出流中放入一个字符</p>
+<h3 id="Exercise9-2"><a href="#Exercise9-2" class="headerlink" title="Exercise9.2"></a>Exercise9.2</h3><blockquote>
+<p>Explain the following from <code>console.c</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (crt_pos &gt;= CRT_SIZE) &#123;</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line"><span class="built_in">memcpy</span>(crt_buf, crt_buf + CRT_COLS, (CRT_SIZE - CRT_COLS) * <span class="keyword">sizeof</span>(<span class="keyword">uint16_t</span>));</span><br><span class="line"><span class="keyword">for</span> (i = CRT_SIZE - CRT_COLS; i &lt; CRT_SIZE; i++)</span><br><span class="line">		crt_buf[i] = <span class="number">0x0700</span> | <span class="string">' '</span>;</span><br><span class="line">	crt_pos -= CRT_COLS;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>整体上移一行，并在新的一行中填入空格</p>
+<h3 id="Exercise9-3"><a href="#Exercise9-3" class="headerlink" title="Exercise9.3"></a>Exercise9.3</h3><blockquote>
+<p>For the following questions you might wish to consult the notes for Lecture 2. These notes cover GCC’s calling convention on the x86.</p>
+<p>Trace the execution of the following code step-by-step:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> x = <span class="number">1</span>, y = <span class="number">3</span>, z = <span class="number">4</span>;</span><br><span class="line">cprintf(<span class="string">"x %d, y %x, z %d\n"</span>, x, y, z);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>In the call to <code>cprintf()</code>, to what does <code>fmt</code> point? To what does <code>ap</code> point?</li>
+</ul>
+</blockquote>
+<p><code>fmt</code>指向格式化字符串<code>&quot;x %d, y %x, z %d\n&quot;</code>，<code>ap</code>指向第一个可选参数<code>x</code></p>
+<h3 id="Exercise9-4"><a href="#Exercise9-4" class="headerlink" title="Exercise9.4"></a>Exercise9.4</h3><blockquote>
+<p>Run the following code.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0x00646c72</span>;</span><br><span class="line">    cprintf(<span class="string">"H%x Wo%s"</span>, <span class="number">57616</span>, &amp;i);</span><br></pre></td></tr></table></figure>
+<p>What is the output? Explain how this output is arrived out in the step-by-step manner of the previous exercise</p>
+</blockquote>
+<p>output：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">He110 World</span><br></pre></td></tr></table></figure>
+<p>原因：</p>
+<ul>
+<li>57616 == 0xe110</li>
+<li>0x64 == ‘d’, 0x6c == ‘l’, 0x72 == ‘r’</li>
+</ul>
+<blockquote>
+<p>The output depends on that fact that the x86 is little-endian. If the x86 were instead big-endian what would you set <code>i</code> to in order to yield the same output? Would you need to change <code>57616</code> to a different value?</p>
+</blockquote>
+<p>i需要改为<code>0x726c6400</code>,<code>57616</code>不需要改</p>
+<h3 id="Exercise9-5"><a href="#Exercise9-5" class="headerlink" title="Exercise9.5"></a>Exercise9.5</h3><blockquote>
+<p>In the following code, what is going to be printed after<code>y=</code>? (note: the answer is not a specific value.) Why does this happen?</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cprintf(<span class="string">"x=%d y=%d"</span>, <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>一个在栈上相邻的值</p>
+<h3 id="Exercise9-6"><a href="#Exercise9-6" class="headerlink" title="Exercise9.6"></a>Exercise9.6</h3><blockquote>
+<p>Let’s say that GCC changed its calling convention so that it pushed arguments on the stack in declaration order, so that the last argument is pushed last. How would you have to change <code>cprintf</code>or its interface so that it would still be possible to pass it a variable number of arguments?</p>
+</blockquote>
+<p>分析：</p>
+<ul>
+<li>对于<code>cprintf</code>而言，需要知道<code>fmt</code>的内容才能确定参数的数量</li>
+<li>对于这一种传参方式，需要知道参数的数量才能确定第一个参数的位置</li>
+</ul>
+<p>所以解决方案可能有：</p>
+<ol>
+<li>新增一个参数，内容为参数数量，在参数表的末尾</li>
+<li>只接受固定的两个参数，第一个为<code>fmt</code>，第二个为以NULL结尾的链表的首地址，链表中为参数，类似于<code>char **argv</code></li>
+<li>将可选参数放在前面，<code>fmt</code>在最后</li>
+</ol>
+<h3 id="Exercise10"><a href="#Exercise10" class="headerlink" title="Exercise10"></a>Exercise10</h3><blockquote>
+<p>Modify the function <code>printnum()</code> in <code>lib/printfmt.c</code> to support <code>&quot;%-&quot;</code>when printing numbers. With the directives starting with “%-“, the printed number should be left adjusted. (i.e., paddings are on the right side.) For example, the following function call:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cprintf(&quot;test:[%-5d]&quot;, 3)</span><br></pre></td></tr></table></figure>
+<p>, should give a result as<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;test:[3    ]&quot;</span><br></pre></td></tr></table></figure></p>
+<p>(4 spaces after ‘3’). Before modifying<code>printnum()</code>, make sure you know what happened in function<code>vprintffmt()</code>.</p>
+</blockquote>
+<p>思路：先统计输出的数字的位数(<code>O(log n)</code>)，然后输出数字，再补足空格</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (padc == <span class="string">'-'</span>) &#123;</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> num_of_digit = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> temp = num;</span><br><span class="line">	<span class="keyword">while</span>(temp &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		num_of_digit += <span class="number">1</span>;</span><br><span class="line">		temp /= base;</span><br><span class="line">	&#125;</span><br><span class="line">	printnum(putch, putdat, num, base, num_of_digit, <span class="string">' '</span>);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; width - num_of_digit; i++)</span><br><span class="line">		putch(<span class="string">' '</span>, putdat);</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Exercise11"><a href="#Exercise11" class="headerlink" title="Exercise11"></a>Exercise11</h3><blockquote>
+<p>Determine where the kernel initializes its stack, and exactly where in memory its stack is located. How does the kernel reserve space for its stack? And at which “end” of this reserved area is the stack pointer initialized to point to?</p>
+</blockquote>
+<p>/kern/entry.S:75</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Set the stack pointer</span><br><span class="line">movl	$(bootstacktop),%esp</span><br></pre></td></tr></table></figure>
+<h3 id="Exercise12"><a href="#Exercise12" class="headerlink" title="Exercise12"></a>Exercise12</h3><blockquote>
+<p>To become familiar with the C calling conventions on the x86, find the address of the <code>test_backtrace</code> function in <code>obj/kern/kernel.asm</code>, set a breakpoint there, and examine what happens each time it gets called after the kernel starts. How many 32-bit words does each recursive nesting level of <code>test_backtrace</code> push on the stack, and what are those words?</p>
+</blockquote>
+<p>发现每次调用esp缩小0x20，即8 words</p>
+<h3 id="Exercise13"><a href="#Exercise13" class="headerlink" title="Exercise13"></a>Exercise13</h3><blockquote>
+<p> Implement the backtrace function as specified above.</p>
+</blockquote>
+<p>既然已经提供了<code>read_ebp</code>函数，那么顺着ebp一路摸上去就能得到<code>return address</code>和各个参数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ebp = (<span class="keyword">unsigned</span> <span class="keyword">int</span> *)read_ebp();</span><br><span class="line"><span class="keyword">for</span> (;ebp != <span class="literal">NULL</span>;) &#123;</span><br><span class="line">	cprintf(<span class="string">"eip %8x  ebp %8x  args %08x %08x %08x %08x %08x\n"</span>, </span><br><span class="line">			ebp[<span class="number">1</span>], ebp, ebp[<span class="number">2</span>], ebp[<span class="number">3</span>], ebp[<span class="number">4</span>], ebp[<span class="number">5</span>], ebp[<span class="number">6</span>]);</span><br><span class="line">	ebp = (<span class="keyword">unsigned</span> <span class="keyword">int</span> *)(*ebp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些在ics的buffer overflow中见的多了。另一个问题是什么时候停止循环。在entry.S中发现:(entry.S:73)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movl	$0x0,%ebp			# nuke frame pointer</span><br></pre></td></tr></table></figure>
+<p>也就是说，初始化时ebp为0，当发现ebp为0(NULL)时即可停止循环。</p>
+<h3 id="Exercise14"><a href="#Exercise14" class="headerlink" title="Exercise14"></a>Exercise14</h3><blockquote>
+<p>Modify your stack backtrace function to display, for each <code>eip</code>, the function name, source file name, and line number corresponding to that <code>eip</code>.</p>
+</blockquote>
+<p>仿照上下文，添加：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">stab_binsearch(stabs, &amp;lline, &amp;rline, N_SLINE, addr);</span><br><span class="line"><span class="keyword">if</span> (lline &lt;= rline) &#123;</span><br><span class="line">	info-&gt;eip_line = rline;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p> where do <code>__STAB_*</code> come from？</p>
+</blockquote>
+<p>stab是gcc生成的调试信息，具体格式可以参考：<a href="http://caobeixingqiu.is-programmer.com/posts/12361.html" target="_blank" rel="noopener">GCC 生成的符号表调试信息剖析</a></p>
+<h3 id="Exercise15"><a href="#Exercise15" class="headerlink" title="Exercise15"></a>Exercise15</h3><blockquote>
+<p>In this exercise, you need to implement a rather easy “time” command. The output of the “time” is the running time (in clocks cycles) of the command. The usage of this command is like this: “time [command]”.</p>
+</blockquote>
+<p>这个在大一暑假作业简易数据库的性能测试中就实现过一个类似，思路是：</p>
+<ol>
+<li>记录开始时时间</li>
+<li>运行</li>
+<li>记录结束时时间</li>
+</ol>
+<p>实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span><br><span class="line">mon_time(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv, struct Trapframe *tf)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">uint64_t</span> before, after;</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">Command</span> <span class="title">command</span>;</span></span><br><span class="line">	<span class="comment">/* search */</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; NCOMMANDS; i++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(commands[i].name, argv[<span class="number">1</span>]) == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (i == NCOMMANDS)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* run */</span></span><br><span class="line">	before = read_tsc();</span><br><span class="line">	(commands[i].func)(argc<span class="number">-1</span>, argv+<span class="number">1</span>, tf);</span><br><span class="line">	after = read_tsc();</span><br><span class="line">	cprintf(<span class="string">"%s cycles: %d\n"</span>, commands[i].name, after - before);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个lab需要写代码的部分只是真正的冰山一角，甚至大多能在上下文中找到提示。而对这些问题的思考才是这个lab最大的意义。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mit6-828/" rel="tag"># mit6.828</a>
+          
+            <a href="/tags/OS/" rel="tag"># OS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/26/base64翻译工具/" rel="next" title="base64翻译工具">
+                <i class="fa fa-chevron-left"></i> base64翻译工具
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Jimmy" />
+          <p class="site-author-name" itemprop="name">Jimmy</p>
+           
+              <p class="site-description motion-element" itemprop="description">sometimes naive</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境配置"><span class="nav-number">1.</span> <span class="nav-text">环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gcc降级"><span class="nav-number">1.1.</span> <span class="nav-text">gcc降级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#32位依赖包的安装"><span class="nav-number">1.2.</span> <span class="nav-text">32位依赖包的安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#qemu安装"><span class="nav-number">1.3.</span> <span class="nav-text">qemu安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统的启动流程"><span class="nav-number">2.</span> <span class="nav-text">系统的启动流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可变参数数量的函数"><span class="nav-number">3.</span> <span class="nav-text">可变参数数量的函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stdarg-h"><span class="nav-number">3.1.</span> <span class="nav-text">stdarg.h</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Exercises"><span class="nav-number">4.</span> <span class="nav-text">Exercises</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise-3"><span class="nav-number">4.1.</span> <span class="nav-text">Exercise 3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise5"><span class="nav-number">4.2.</span> <span class="nav-text">Exercise5</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise6"><span class="nav-number">4.3.</span> <span class="nav-text">Exercise6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise7"><span class="nav-number">4.4.</span> <span class="nav-text">Exercise7</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise8"><span class="nav-number">4.5.</span> <span class="nav-text">Exercise8</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-0"><span class="nav-number">4.6.</span> <span class="nav-text">Exercise9.0</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-1"><span class="nav-number">4.7.</span> <span class="nav-text">Exercise9.1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-2"><span class="nav-number">4.8.</span> <span class="nav-text">Exercise9.2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-3"><span class="nav-number">4.9.</span> <span class="nav-text">Exercise9.3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-4"><span class="nav-number">4.10.</span> <span class="nav-text">Exercise9.4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-5"><span class="nav-number">4.11.</span> <span class="nav-text">Exercise9.5</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise9-6"><span class="nav-number">4.12.</span> <span class="nav-text">Exercise9.6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise10"><span class="nav-number">4.13.</span> <span class="nav-text">Exercise10</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise11"><span class="nav-number">4.14.</span> <span class="nav-text">Exercise11</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise12"><span class="nav-number">4.15.</span> <span class="nav-text">Exercise12</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise13"><span class="nav-number">4.16.</span> <span class="nav-text">Exercise13</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise14"><span class="nav-number">4.17.</span> <span class="nav-text">Exercise14</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Exercise15"><span class="nav-number">4.18.</span> <span class="nav-text">Exercise15</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jimmy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://dhpo.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/03/18/OS-Lab1-实验报告/';
+          this.page.identifier = '2018/03/18/OS-Lab1-实验报告/';
+          this.page.title = 'OS Lab1 实验报告';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://dhpo.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
