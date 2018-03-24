@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="nodejs,spider,typescript," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言数据抓取完成后，一种不错的展示方式是生成一个RSS源（虽然RSS已经凉了）。 现在大概要干这么几件事：  使用express框架跑一个服务器 按照RSS的格式输出XML，这最好使用模版实现 之前爬的是文章简介，现在要爬全文 爬得多了需要控制速度  Express安装express是目前最流行的nodejs服务器框架。首先安装它： 12npm install express --savenpm">
+<meta name="keywords" content="nodejs,spider,typescript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Typescirpt Spider: RSS输出">
+<meta property="og:url" content="http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Blog">
+<meta property="og:description" content="前言数据抓取完成后，一种不错的展示方式是生成一个RSS源（虽然RSS已经凉了）。 现在大概要干这么几件事：  使用express框架跑一个服务器 按照RSS的格式输出XML，这最好使用模版实现 之前爬的是文章简介，现在要爬全文 爬得多了需要控制速度  Express安装express是目前最流行的nodejs服务器框架。首先安装它： 12npm install express --savenpm">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/20180324232019.png">
+<meta property="og:updated_time" content="2018-03-24T15:55:18.750Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Typescirpt Spider: RSS输出">
+<meta name="twitter:description" content="前言数据抓取完成后，一种不错的展示方式是生成一个RSS源（虽然RSS已经凉了）。 现在大概要干这么几件事：  使用express框架跑一个服务器 按照RSS的格式输出XML，这最好使用模版实现 之前爬的是文章简介，现在要爬全文 爬得多了需要控制速度  Express安装express是目前最流行的nodejs服务器框架。首先安装它： 12npm install express --savenpm">
+<meta name="twitter:image" content="http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/20180324232019.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/"/>
+
+
+
+
+
+  <title>Typescirpt Spider: RSS输出 | Jimmy's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jimmy's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">学习一个</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jimmy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jimmy's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Typescirpt Spider: RSS输出</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-24T22:45:22+08:00">
+                2018-03-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/24/Typescirpt-Spider-RSS输出/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/24/Typescirpt-Spider-RSS输出/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>数据抓取完成后，一种不错的展示方式是生成一个RSS源（虽然RSS已经凉了）。</p>
+<p>现在大概要干这么几件事：</p>
+<ul>
+<li>使用express框架跑一个服务器</li>
+<li>按照RSS的格式输出XML，这最好使用模版实现</li>
+<li>之前爬的是文章简介，现在要爬全文</li>
+<li>爬得多了需要控制速度</li>
+</ul>
+<h2 id="Express"><a href="#Express" class="headerlink" title="Express"></a>Express</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p><a href="http://expressjs.com/" target="_blank" rel="noopener"><code>express</code></a>是目前最流行的nodejs服务器框架。首先安装它：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install express --save</span><br><span class="line">npm install @types/express --save-dev</span><br></pre></td></tr></table></figure>
+<h3 id="HelloWorld"><a href="#HelloWorld" class="headerlink" title="HelloWorld"></a>HelloWorld</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> express <span class="keyword">from</span> <span class="string">"express"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = express();</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">"/"</span>, <span class="function">(<span class="params">req: Request, res: Response</span>) =&gt;</span> &#123;</span><br><span class="line">    res.send(<span class="string">"Welcome to CnBeta Spider"</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">app.listen(<span class="number">8080</span>);</span><br></pre></td></tr></table></figure>
+<p>express的书写范式和SpingMVC还是挺相似的，使用<code>get</code>、<code>post</code>等方法匹配协议，使用第一个参数<code>url</code>匹配链接，然后传入一个handler，从request中读取请求数据，将结果写入response中。</p>
+<p>更复杂的操作（中间件等）在这里就不多述了。</p>
+<p>现在，理论上我们可以按照格式把XML写到response中实现RSS。不过，还是用模板比较好。</p>
+<h2 id="Pug"><a href="#Pug" class="headerlink" title="Pug"></a>Pug</h2><h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><p><a href="https://github.com/pugjs/pug" target="_blank" rel="noopener">pug</a>是一种基于Nodejs的模版引擎（原来叫Jade，我之前只听说过Jade）。首先是安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install pug --save</span><br><span class="line">npm install @types/pug --save-dev</span><br></pre></td></tr></table></figure>
+<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><p>pug的语法是基于缩进的。每一行的第一个单词表示标签名，之后的是标签的数据（不是元数据）。如果下一行的缩进比这一行更多，那么下一行的标签就是这一行的儿子。</p>
+<p>pug也可以在中间引入变量，也有逻辑控制和遍历。这些在模板渲染时根据传入的数据填写这些变量。</p>
+<p>最终的模板是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">doctype xml</span><br><span class="line">rss(version=&quot;1.0&quot;)</span><br><span class="line">  channel</span><br><span class="line">    title cnbeta-rss</span><br><span class="line">    link https://www.cnbeta.com</span><br><span class="line">    description 中文业界资讯站</span><br><span class="line">    each n in news</span><br><span class="line">      item</span><br><span class="line">        title #&#123;n.title&#125;</span><br><span class="line">        link #&#123;n.url&#125;</span><br><span class="line">        description #&#123;n.content&#125;</span><br><span class="line">        pubDate #&#123;n.time&#125;</span><br></pre></td></tr></table></figure>
+<p>每一个<code>item</code>就是一条新闻。因为新闻有很多条，所以使用<code>each ... in ...</code>遍历所有的<code>news</code>（这里的<code>news</code>是所有新闻的数组）。</p>
+<h3 id="与express的集成"><a href="#与express的集成" class="headerlink" title="与express的集成"></a>与express的集成</h3><p>首先需要在express中设置渲染引擎和模板的位置：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">app.set(<span class="string">"view engine"</span>, <span class="string">"pug"</span>);</span><br><span class="line">app.set(<span class="string">"views"</span>, __dirname + <span class="string">"/Views"</span>);</span><br></pre></td></tr></table></figure>
+<p>然后在handler中使用<code>render</code>方法渲染，并传入参数<code>news</code>（模板在<code>/Views</code>目录下，文件名为<code>rss.pug</code>）：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">app.get(<span class="string">"/rss"</span>, <span class="keyword">async</span> (req: Request, res: Response) =&gt; &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> news = <span class="keyword">await</span> News.find(&#123;&#125;).sort(&#123;time: <span class="number">-1</span>&#125;).exec();</span><br><span class="line">      res.render(<span class="string">"rss"</span>, &#123;news&#125;);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(err);</span><br><span class="line">      res.send(<span class="string">"Error"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+<p>使用Firefox访问<code>http://localhost:8080/rss</code>就可以看到渲染结果了：</p>
+<img src="/2018/03/24/Typescirpt-Spider-RSS输出/20180324232019.png">
+<p>express可以把渲染好的页面存起来，避免重复渲染相同的页面。要启用这个功能，需要加一行设置：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">app.enable(<span class="string">"view cache"</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="npm-script"><a href="#npm-script" class="headerlink" title="npm script"></a>npm script</h2><p>现在还有一个问题：模板作为源文件应该放在<code>/src</code>目录下，但是编译为js后却是在<code>/out</code>目录下寻找。所以在build的时候需要把模板复制到<code>/out</code>目录下。另外我们也希望在build完成后直接运行<code>main.js</code>。</p>
+<p>要达到这两个目的，可以修改<code>package.json</code>，使用npm script实现：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">"scripts": &#123;</span><br><span class="line">    "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",</span><br><span class="line">    "build": "tsc &amp;&amp; cp src/Views/* out/Views/*",</span><br><span class="line">    "postbuild": "node out/main.js"</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>其中<code>build</code>和<code>postbuild</code>是新加的。<code>build</code>完成了对<code>tsc</code>的调用和对模板的复制；<code>postbuild</code>会在<code>build</code>之后自动执行，其目的是运行<code>main.js</code>。之后在终端中输入<code>npm run build</code>即可执行这两个脚本。</p>
+<h2 id="全文爬取"><a href="#全文爬取" class="headerlink" title="全文爬取"></a>全文爬取</h2><p>之前的新闻的<code>content</code>是直接从首页中获取的，只有内容的概述。现在我们希望获得新闻的全文。</p>
+<p>由于之前我们已经获得了新闻的链接，因此我们可以直接访问新闻的页面，提取出正文的内容：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getContent = <span class="keyword">async</span> (url: <span class="built_in">string</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> response = <span class="keyword">await</span> remoteGet(url);</span><br><span class="line">    <span class="keyword">const</span> $ = cheerio.load(response.text);</span><br><span class="line">    <span class="keyword">let</span> result: <span class="built_in">string</span> = <span class="string">"&lt;p&gt;"</span> + $(<span class="string">".article-summary&gt;p"</span>).html() || <span class="string">""</span> + <span class="string">"&lt;/p&gt;"</span>;</span><br><span class="line">    $(<span class="string">"#artibody&gt;p"</span>).each(<span class="function">(<span class="params">index, element</span>) =&gt;</span> &#123;</span><br><span class="line">        result += <span class="string">"&lt;p&gt;"</span> + $(element).html() || <span class="string">""</span> + <span class="string">"&lt;/p&gt;"</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>提取的方式是找到所有的<code>&lt;p&gt;</code>标签，取出标签中的内容，再加上<code>&lt;p&gt;</code>标签后拼接在一起。</p>
+<p><code>parse</code>函数中获取<code>content</code>的语句也要做相应的修改。</p>
+<h2 id="爬取速度控制：forEach中的await"><a href="#爬取速度控制：forEach中的await" class="headerlink" title="爬取速度控制：forEach中的await"></a>爬取速度控制：<code>forEach</code>中的<code>await</code></h2><p>cnbeta每页有25条新闻，如果同时发起25次<code>getContent</code>容易被服务器封禁ip，因此需要对访问速度进行限制。</p>
+<p>首先想到的方法是，在<code>remoteGet</code>方法中加一句<code>await sleep(1000)</code>，这样就可以保证每秒发起一次请求。</p>
+<p>不过测试的结果和预期并不一样：实际情况是<strong>过了1s后同时发起25个请求</strong>，而不是每隔1s发起一个请求。</p>
+<p>翻了文档以后发现，<code>Cheerio</code>的<code>each</code>并不会等到callback函数执行完毕才运行下一个（也就是说并不会<code>await callback</code>），这样实际上是生成了25个等待的线程，和预期产生了不同的结果。</p>
+<p>现在js的<code>for (... on ...)</code>语句是可以等到循环体执行完毕后再运行下一个的（也就是会<code>await</code>循环体）。所以现在的思路是使用<code>for (... on ...)</code>遍历所有的<code>element</code>：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> items: CheerioElement[] = $(<span class="string">".item"</span>).get();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> element of items) &#123;</span><br><span class="line">        <span class="keyword">const</span> title: <span class="built_in">string</span> = $(element).find(<span class="string">"a"</span>).first().text().trim();</span><br><span class="line">        <span class="keyword">if</span> (title === <span class="string">""</span> || <span class="keyword">await</span> News.findOne(&#123;title&#125;).exec() !== <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">const</span> url: <span class="built_in">string</span> = $(element).find(<span class="string">"a"</span>).first().attr(<span class="string">"href"</span>);</span><br><span class="line">        <span class="keyword">let</span> content: <span class="built_in">string</span> = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            content = <span class="keyword">await</span> getContent(url);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">            <span class="built_in">console</span>.log(err);</span><br><span class="line">            content = $(element).find(<span class="string">"p"</span>).first().text().trim();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">const</span> rawTime: <span class="built_in">string</span> = ($(element).find(<span class="string">".status&gt;li"</span>).first().text()</span><br><span class="line">            .match(<span class="regexp">/\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125; \d&#123;2&#125;:\d&#123;2&#125;/g</span>) || [<span class="string">""</span>])[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">const</span> time: <span class="built_in">Date</span> = <span class="keyword">new</span> <span class="built_in">Date</span>(rawTime);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">const</span> news = <span class="keyword">new</span> News(&#123;title, url, time, content&#125;);</span><br><span class="line">        news.save(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;<span class="keyword">if</span> (err) &#123;<span class="built_in">console</span>.log(err); &#125;&#125;);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>$(&quot;.item&quot;).get()</code>返回所有的<code>CheerioElement</code>的集合。</p>
+<p>这里我遇到了一个typescript的坑：编译时报了一个错误：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">src/spider.ts(11,11): error TS2322: Type <span class="string">'string[]'</span> is not assignable to <span class="built_in">type</span> <span class="string">'CheerioElement[]'</span>.</span><br><span class="line">  Type <span class="string">'string'</span> is not assignable to <span class="built_in">type</span> <span class="string">'CheerioElement'</span>.</span><br></pre></td></tr></table></figure>
+<p>意思是，编译器认为<code>$(&quot;.item&quot;).get()</code>的返回值类型是<code>string[]</code>，与预期类型不服。但是翻看<code>Cheerio</code>的类型声明，可以看到：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">get</span>(): <span class="built_in">string</span>[];</span><br><span class="line"><span class="keyword">get</span>(): CheerioElement[];</span><br><span class="line"><span class="keyword">get</span>(index: <span class="built_in">number</span>): CheerioElement;</span><br></pre></td></tr></table></figure>
+<p>也就是说这个函数有三种重载类型，编译器取的是第一种，而我需要的是第二种。</p>
+<p>理论上，在我钦定了返回值的类型后，编译器是有足够的信息判断适用哪一种，但是typescript的做法是取匹配到的第一个。这一点在官方文档中也提到了：</p>
+<blockquote>
+<p><em>Don’t</em> put more general overloads before more specific overloads:</p>
+</blockquote>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* WRONG */</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: <span class="built_in">any</span></span>): <span class="title">any</span></span>;</span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: HTMLElement</span>): <span class="title">number</span></span>;</span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: HTMLDivElement</span>): <span class="title">string</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myElem: HTMLDivElement;</span><br><span class="line"><span class="keyword">var</span> x = fn(myElem); <span class="comment">// x: any, wat?</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><em>Do</em> sort overloads by putting the more general signatures after more specific signatures:</p>
+</blockquote>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* OK */</span></span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: HTMLDivElement</span>): <span class="title">string</span></span>;</span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: HTMLElement</span>): <span class="title">number</span></span>;</span><br><span class="line"><span class="keyword">declare</span> <span class="function"><span class="keyword">function</span> <span class="title">fn</span>(<span class="params">x: <span class="built_in">any</span></span>): <span class="title">any</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> myElem: HTMLDivElement;</span><br><span class="line"><span class="keyword">var</span> x = fn(myElem); <span class="comment">// x: string, :)</span></span><br></pre></td></tr></table></figure>
+<p>解决方案有两个：</p>
+<ol>
+<li>修改类型声明，将我需要的移到第一个</li>
+<li>修改代码，适用第一个函数</li>
+</ol>
+<p>如果需要将代码共享给他人使用，那么只能使用方案二，因为你无法要求他人改库的类型声明。</p>
+<p>不过这只是我的个人玩具，为了方便还是选择了方案一。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>目前比较好地实现了对新闻的爬取和解析工作，不过还没有很好地支持RSS标准中反人类的时间格式规范。</p>
+<p>接下来还是要尝试爬一些不同的网站，比如说做个知乎日报的RSS。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nodejs/" rel="tag"># nodejs</a>
+          
+            <a href="/tags/spider/" rel="tag"># spider</a>
+          
+            <a href="/tags/typescript/" rel="tag"># typescript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/24/Typescript-Spider/" rel="next" title="Typescript Spider：基础篇">
+                <i class="fa fa-chevron-left"></i> Typescript Spider：基础篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Jimmy" />
+          <p class="site-author-name" itemprop="name">Jimmy</p>
+           
+              <p class="site-description motion-element" itemprop="description">sometimes naive</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Express"><span class="nav-number">2.</span> <span class="nav-text">Express</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HelloWorld"><span class="nav-number">2.2.</span> <span class="nav-text">HelloWorld</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pug"><span class="nav-number">3.</span> <span class="nav-text">Pug</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-1"><span class="nav-number">3.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法"><span class="nav-number">3.2.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#与express的集成"><span class="nav-number">3.3.</span> <span class="nav-text">与express的集成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#npm-script"><span class="nav-number">4.</span> <span class="nav-text">npm script</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全文爬取"><span class="nav-number">5.</span> <span class="nav-text">全文爬取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#爬取速度控制：forEach中的await"><span class="nav-number">6.</span> <span class="nav-text">爬取速度控制：forEach中的await</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jimmy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://dhpo.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/03/24/Typescirpt-Spider-RSS输出/';
+          this.page.identifier = '2018/03/24/Typescirpt-Spider-RSS输出/';
+          this.page.title = 'Typescirpt Spider: RSS输出';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://dhpo.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
