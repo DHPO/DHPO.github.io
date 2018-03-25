@@ -1,5 +1,5 @@
 ---
-title: 'Typescirpt Spider: RSS输出'
+title: 'Typescirpt Spider 2: RSS输出'
 date: 2018-03-24 22:45:22
 tags:
   - nodejs
