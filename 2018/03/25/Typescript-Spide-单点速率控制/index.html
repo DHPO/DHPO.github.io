@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="nodejs,spider,typescript," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前言之前提到速率控制的方式太僵硬，相当于是把整个程序写成完全串行的形式。而比较理想的控制方式是remoteGet函数自身保证请求发送的间隔，调用者只需要静静地await就行了。 启发我偶然间看到了这篇文章：JavaScript Promise：简介，其中讲到了一个场景：并行地加载一部小说的各个章节，但是要按照顺序将它们显示出来。文中的解决方案是（中文注释是我加的）： 123456789101112">
+<meta name="keywords" content="nodejs,spider,typescript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Typescript Spide 4: 单点速率控制——Promise链">
+<meta property="og:url" content="https://dhpo.github.io/2018/03/25/Typescript-Spide-单点速率控制/index.html">
+<meta property="og:site_name" content="Jimmy&#39;s Blog">
+<meta property="og:description" content="前言之前提到速率控制的方式太僵硬，相当于是把整个程序写成完全串行的形式。而比较理想的控制方式是remoteGet函数自身保证请求发送的间隔，调用者只需要静静地await就行了。 启发我偶然间看到了这篇文章：JavaScript Promise：简介，其中讲到了一个场景：并行地加载一部小说的各个章节，但是要按照顺序将它们显示出来。文中的解决方案是（中文注释是我加的）： 123456789101112">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-25T14:00:40.522Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Typescript Spide 4: 单点速率控制——Promise链">
+<meta name="twitter:description" content="前言之前提到速率控制的方式太僵硬，相当于是把整个程序写成完全串行的形式。而比较理想的控制方式是remoteGet函数自身保证请求发送的间隔，调用者只需要静静地await就行了。 启发我偶然间看到了这篇文章：JavaScript Promise：简介，其中讲到了一个场景：并行地加载一部小说的各个章节，但是要按照顺序将它们显示出来。文中的解决方案是（中文注释是我加的）： 123456789101112">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://dhpo.github.io/2018/03/25/Typescript-Spide-单点速率控制/"/>
+
+
+
+
+
+  <title>Typescript Spide 4: 单点速率控制——Promise链 | Jimmy's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jimmy's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">学习一个</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://dhpo.github.io/2018/03/25/Typescript-Spide-单点速率控制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jimmy">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jimmy's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Typescript Spide 4: 单点速率控制——Promise链</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-25T21:02:42+08:00">
+                2018-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/25/Typescript-Spide-单点速率控制/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/25/Typescript-Spide-单点速率控制/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前提到速率控制的方式太僵硬，相当于是把整个程序写成完全串行的形式。而比较理想的控制方式是<code>remoteGet</code>函数自身保证请求发送的间隔，调用者只需要静静地<code>await</code>就行了。</p>
+<h2 id="启发"><a href="#启发" class="headerlink" title="启发"></a>启发</h2><p>我偶然间看到了这篇文章：<a href="https://developers.google.com/web/fundamentals/primers/promises?hl=zh-cn" target="_blank" rel="noopener">JavaScript Promise：简介</a>，其中讲到了一个场景：并行地加载一部小说的各个章节，但是要按照顺序将它们显示出来。文中的解决方案是（中文注释是我加的）：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">getJSON(<span class="string">'story.json'</span>).then(<span class="function"><span class="keyword">function</span>(<span class="params">story</span>) </span>&#123;</span><br><span class="line">  addHtmlToPage(story.heading);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Map our array of chapter urls to</span></span><br><span class="line">  <span class="comment">// an array of chapter json promises.</span></span><br><span class="line">  <span class="comment">// This makes sure they all download parallel.</span></span><br><span class="line">  <span class="keyword">return</span> story.chapterUrls.map(getJSON) <span class="comment">/* 生成好多个Promise */</span></span><br><span class="line">    .reduce(<span class="function"><span class="keyword">function</span>(<span class="params">sequence, chapterPromise</span>) </span>&#123;</span><br><span class="line">      <span class="comment">// Use reduce to chain the promises together,</span></span><br><span class="line">      <span class="comment">// adding content to the page for each chapter</span></span><br><span class="line">      <span class="keyword">return</span> sequence.then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="comment">/* 把Promise串起来 */</span></span><br><span class="line">        <span class="comment">// Wait for everything in the sequence so far,</span></span><br><span class="line">        <span class="comment">// then wait for this chapter to arrive.</span></span><br><span class="line">        <span class="keyword">return</span> chapterPromise;</span><br><span class="line">      &#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params">chapter</span>) </span>&#123;</span><br><span class="line">        addHtmlToPage(chapter.html);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;, <span class="built_in">Promise</span>.resolve());</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  addTextToPage(<span class="string">"All done"</span>);</span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span>(<span class="params">err</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// catch any error that happened along the way</span></span><br><span class="line">  addTextToPage(<span class="string">"Argh, broken: "</span> + err.message);</span><br><span class="line">&#125;).then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">document</span>.querySelector(<span class="string">'.spinner'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>这种实现思路是：先用map生成一系列的Promise，让这些Promise先跑起来，保证下载的并行性；之后再形成(<code>getJson</code>)-&gt;(<code>addHtmlToPage</code>)-&gt;(<code>getJson</code>)-&gt;(<code>addHtmlToPage</code>)-&gt;…的序列，保证输出的有序性。</p>
+<p>这启示了我这几件事：</p>
+<ul>
+<li>Promise的运行和<code>await</code>并不一定要在一起</li>
+<li>Promise可以形成很长的链（可以在中间插入几个sleep）</li>
+<li>Promise可以嵌套</li>
+</ul>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>所有的改动都在<code>remoteGet</code>函数上：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> sequence = <span class="built_in">Promise</span>.resolve();</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> remoteGet = <span class="keyword">async</span> (url: <span class="built_in">string</span>) =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>&lt;superagent.Response&gt;<span class="function">(<span class="params">(<span class="params">resolve, reject</span>) =&gt; &#123;</span></span></span><br><span class="line"><span class="function"><span class="params">        sequence = sequence.then(<span class="params">(<span class="params"></span>) =&gt; &#123;</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">            <span class="keyword">return</span> sleep(<span class="params">config.spider.interval * 1000</span>);</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">        &#125;</span>).then(<span class="params"><span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">            <span class="built_in">console</span>.log(<span class="params">`GET $&#123;url&#125;`</span>);</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">            <span class="keyword">const</span> response = <span class="keyword">await</span> superagent.<span class="keyword">get</span>(<span class="params">url</span>);</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">            resolve(<span class="params">response</span>);</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">        &#125;</span>).<span class="keyword">catch</span>(<span class="params">(<span class="params">err</span>) =&gt; &#123;</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">            reject(<span class="params">err</span>);</span></span></span></span><br><span class="line"><span class="function"><span class="params"><span class="params">        &#125;</span>);</span></span></span><br><span class="line"><span class="function"><span class="params">    &#125;</span>);</span></span><br><span class="line"><span class="function">&#125;;</span></span><br></pre></td></tr></table></figure>
+<p>解释一下：</p>
+<ul>
+<li><code>sequence</code>是一个Promise链，每次调用<code>remoteGet</code>时往链上加上一个<code>sleep</code>和之前发送请求的函数(<code>superagent.get(url)</code>)</li>
+<li>当对<code>remoteGet</code>进行<code>await</code>的时候，首先等待外层的Promise的执行。外层的Promise什么时候resolve呢？要等到sequence运行到第10行。</li>
+<li>根据Promise链的特性，要sequence运行到第10行，首先要运行完sequence链之前的内容，包括之前所有的<code>sleep</code></li>
+<li>为了防止中途有些链接出错而导致整个链终止，在后面需要加上<code>catch</code></li>
+</ul>
+<p>虽然<code>remoteGet</code>早早地返回了Promise，但是这个Promise实际上要等到sequence执行到第10行才会resolve，<code>await remoteGet</code>的函数才会继续执行下去。实际上<code>await</code>Promise的resolve和返回Promise是分离的；而不像之前那样，在<code>remoteGet</code>中阻塞一段时间后才返回一个Promise，Promise返回后不久就会resolve。</p>
+<p>这种设计解决了这么几个问题：</p>
+<ul>
+<li>网络请求的阻塞不影响页面解析和数据库访问</li>
+<li>爬虫的其它部分不再需要考虑限速问题，不需要写成串行的形式，因此又可以使用<code>Cheerio</code>库中的<code>each</code>了</li>
+</ul>
+<h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><p>上面的写法虽然好用，但还是有一个问题：sequence容易变得很长。这对调度器似乎不怎么友好。</p>
+<p>另外，把<code>Cheerio</code>改回到<code>each</code>的形式后，<code>await remoteGet</code>不会阻塞<code>parse</code>函数，因此爬虫会一次性爬下很多页的链接，全都加到sequence上。</p>
+<p>因此可以考虑让<code>parse</code>等到所有的<code>await remoteGet</code>都返回以后再返回，也就是等到一页的新闻爬取完成后再加载下一页。</p>
+<p>一个比较naive的实现是加上一个计数器：<code>each</code>的第一步是将计数器+1，下载、解析完写到数据库中以后再-1。那么计数器就代表正在处理的新闻的数量，当计数器为0时说明都处理完了：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> $ = cheerio.load(response.text);</span><br><span class="line"><span class="keyword">let</span> count = <span class="number">0</span>;</span><br><span class="line">$(<span class="string">"li.clear"</span>).each(<span class="keyword">async</span> (index, element) =&gt; &#123;</span><br><span class="line">    count += <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">const</span> title: <span class="built_in">string</span> = $(element).find(<span class="string">"a"</span>).first().text().trim();</span><br><span class="line">    <span class="keyword">if</span> (title === <span class="string">""</span> || <span class="keyword">await</span> News.findOne(&#123;title&#125;).exec() !== <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> url: <span class="built_in">string</span> = <span class="string">"https://m.cnbeta.com"</span> + 			  $(element).find(<span class="string">"a"</span>).first().attr(<span class="string">"href"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> detail: <span class="built_in">string</span>[] = [];</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">    	detail = <span class="keyword">await</span> getContent(url);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(err);</span><br><span class="line">        count -= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> content = detail[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">const</span> rawTime = detail[<span class="number">1</span>];</span><br><span class="line">    <span class="keyword">const</span> time: <span class="built_in">Date</span> = <span class="keyword">new</span> <span class="built_in">Date</span>(rawTime);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> news = <span class="keyword">new</span> News(&#123;title, url, time, content&#125;);</span><br><span class="line">    news.save(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;<span class="keyword">if</span> (err) &#123;<span class="built_in">console</span>.log(err); &#125;&#125;);</span><br><span class="line">    count -= <span class="number">1</span>;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">while</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">await</span> sleep(<span class="number">1000</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对element的遍历可以使用<code>each</code>了，也避免了之前提到的typescript的bug。</p>
+<p>这样就保证sequence的长度不会太长（最多就是每页新闻数*2）.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nodejs/" rel="tag"># nodejs</a>
+          
+            <a href="/tags/spider/" rel="tag"># spider</a>
+          
+            <a href="/tags/typescript/" rel="tag"># typescript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/25/Typescript-Spider-翻页/" rel="next" title="Typescript Spider 3: 翻页">
+                <i class="fa fa-chevron-left"></i> Typescript Spider 3: 翻页
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Jimmy" />
+          <p class="site-author-name" itemprop="name">Jimmy</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启发"><span class="nav-number">2.</span> <span class="nav-text">启发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优化"><span class="nav-number">4.</span> <span class="nav-text">优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jimmy</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://dhpo.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://dhpo.github.io/2018/03/25/Typescript-Spide-单点速率控制/';
+          this.page.identifier = '2018/03/25/Typescript-Spide-单点速率控制/';
+          this.page.title = 'Typescript Spide 4: 单点速率控制——Promise链';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://dhpo.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
